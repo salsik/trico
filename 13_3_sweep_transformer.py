@@ -32,7 +32,8 @@ def build_command(
     base_args: List[str],
     params: Dict[str, Any],
 ) -> List[str]:
-    cmd = [python_exe, train_script, data_path] + base_args
+    #cmd = [python_exe, train_script, data_path] + base_args
+    cmd = [python_exe, train_script] + base_args
     for k, v in params.items():
         flag = f"--{k}"
         # allow boolean flags if you add them later
@@ -151,11 +152,26 @@ def main():
          "batch_size": [256, 512],
     #     "seed": [1, 2, 3],
      })
+    
+
+    space2_k_only = {
+        "clusters_tsv" : [  # 20,40,80,120,200
+           "processed_data/clusters/screen_clusters_k20.tsv", "processed_data/clusters/screen_clusters_k40.tsv","processed_data/clusters/screen_clusters_k80.tsv","processed_data/clusters/screen_clusters_k120.tsv","processed_data/clusters/screen_clusters_k200.tsv"],
+        "ctx": [ 16], # [ 8, 16, 32],
+        "lr": [3e-5], #, 1e-4, 3e-4],
+        "val_ratio": [0.2], #  [0.05, 0.1, 0.2]
+        "dropout": [0.3], #[0.1, 0.2, 0.3],
+        "label_smoothing": [0.0], # , 0.05, 0.1],
+        "epochs": [200],          # keep fixed or vary
+        "patience": [8],      # early stopping sensitivity
+        "weight_decay": [0.1],
+        "batch_size": [256]
+    }
 
     if args.mode == "grid":
-        trials = all_combinations(space)
+        trials = all_combinations(space2_k_only)
     else:
-        trials = sampled_combinations(space, args.num_trials, args.seed)
+        trials = sampled_combinations(space2_k_only, args.num_trials, args.seed)
 
     results_csv = out_dir / "results.csv"
     logs_dir = out_dir / "logs"
@@ -275,4 +291,6 @@ if __name__ == "__main__":
 # 13_2_transformer_next_cluster
 
 ## still need to play with other hyperparameters
-#python sweep_transformer.py --mode grid
+#python 13_3_sweep_transformer.py --mode grid
+
+

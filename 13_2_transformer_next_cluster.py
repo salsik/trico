@@ -11,6 +11,11 @@ import torch.nn as nn
 from torch.utils.data import Dataset, DataLoader
 
 
+
+import re
+from pathlib import Path
+
+
 # -----------------------------
 # Preprocessing (same style as your baselines)
 # -----------------------------
@@ -432,6 +437,15 @@ def create_out_file(args, ap):
         if k in explicit_dests and isinstance(v, (int, float)):
             passed_args.append(str(v))
 
+
+    ## add cluster size k value to the out filename
+    # example: args.data = "processed_data/clusters/screen_clusters_k40.tsv"
+    m = re.search(r'_k(\d+)\.tsv$', Path(args.clusters_tsv).name)
+    k = m.group(1) if m else "unknown"
+
+    passed_args = [f"k{k}"] + passed_args   # or f"K{k}" if you prefer
+
+    
     if args.out is None:
         args.out = "transformer_next_cluster_" + "_".join(passed_args) + ".pt"
     
@@ -441,7 +455,7 @@ def create_out_file(args, ap):
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
-    ap.add_argument("clusters_tsv", help="path to screen_clusters_kXX.tsv")
+    ap.add_argument("--clusters_tsv", help="path to screen_clusters_kXX.tsv")
 
     # core
     ap.add_argument("--ctx", type=int, default=16, help="max context length (prefix length)")
@@ -492,6 +506,20 @@ python 13_2_transformer_next_cluster.py processed_data/clusters/screen_clusters_
 python 13_2_transformer_next_cluster.py processed_data/clusters/screen_clusters_k40.tsv --ctx 16 --epochs 200 --patience 8 --val_ratio 0.1 --lr 1e-4 --dropout 0.2 --label_smoothing 0.1
 
 python 13_2_transformer_next_cluster.py processed_data/clusters/screen_clusters_k40.tsv --ctx 8 --epochs 200 --patience 8 --val_ratio 0.1 --lr 1e-4 --dropout 0.2 --label_smoothing 0.1
+
+
+## best val till now that we used in other experiments: 
+# best_val_0.7187_transformer_next_cluster_16_200_0.2_8_0.3_256_3e-05_0.1_0.0.pt \
+
+python 13_2_transformer_next_cluster.py processed_data/clusters/screen_clusters_k40.tsv --ctx 16 --epochs 200 --patience 8 --val_ratio 0.2 --lr 3e-05 --dropout 0.3 --label_smoothing 0.0 --weight_decay 0.1 --batch_size 256
+
+
+$ for k in 20 40 80 120 200; do
+python 13_2_transformer_next_cluster.py --clusters_tsv "processed_data/clusters/screen_clusters_k${k}.tsv" --ctx 16 --epochs 200 --patience 8 --val_ratio 0.2 --lr 3e-05 --dropout 0.3 --label_smoothing 0.0 --weight_decay 0.1 --batch_size 256   
+| tee "run_k${k}.log";
+ done
+
+
 
 """
 
