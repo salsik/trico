@@ -1,0 +1,35 @@
+{
+  "clusters_tsv": "processed_data\\clusters\\screen_clusters_k40.tsv",
+  "clusters_tsv_sha256": "634beeeb8288676efd7b0df3fb5db300d5daf47b6fb6795c653b235cf5521e40",
+  "oldpipeline_trace_building": {
+    "preserve_tsv_row_order_within_trace": true,
+    "collapse_consecutive_duplicates": true,
+    "min_trace_length_after_collapse": 2
+  },
+  "cross_app": {
+    "eligible_app_count": 7445,
+    "num_traces_len_ge_2": 8005,
+    "test_frac": 0.2,
+    "test_seed": 42,
+    "test_split_mode": "round",
+    "val_frac_within_remaining_train_apps": 0.1,
+    "val_seed": 42,
+    "val_split_mode": "floor",
+    "train_app_count": 5361,
+    "val_app_count": 595,
+    "test_app_count": 1489
+  },
+  "leave_one_category_out": {
+    "held_out_category_count": 26,
+    "source": "tsv",
+    "path": "category_leave_one_out_results_with_transformer_retrain.tsv",
+    "column": "heldout_category"
+  },
+  "outputs": {
+    "train_apps": "reproducibility\\cross_app\\train_apps.txt",
+    "val_apps": "reproducibility\\cross_app\\val_apps.txt",
+    "test_apps": "reproducibility\\cross_app\\test_apps.txt",
+    "split_metadata": "reproducibility\\cross_app\\split_metadata.json",
+    "held_out_categories": "reproducibility\\leave_one_category_out\\held_out_categories.txt"
+  }
+}
